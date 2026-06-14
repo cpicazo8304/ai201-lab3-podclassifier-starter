@@ -95,6 +95,9 @@ the format below:" followed by the output format you chose.
 makes parsing reliable? Think about: a single label on its own line?
 A structured format like "Label: X / Reasoning: Y"? JSON?
 What are the tradeoffs?]
+
+I will request the structured format of "Label: X / Reasoning: Y" since I am using few-shot prompting. Although it is not the exact same fields as the examples, it still puts the result in similar structured format it has seen in the examples. Cons are that I am required to split on : and / which could exist in the reasoning field. Also, if I ever add more fields, I would need to update this part. But, for this particular assignment, I believe this format could work. JSON is flexible but would require more tokens. A single label is simple to extract but could include a lot of extra phrases that would make constructing the prompt more difficult.
+
 ```
 
 ---
@@ -105,6 +108,9 @@ What are the tradeoffs?]
 [blank — what if labeled_examples is empty? What if the description is very
 short? How does your prompt handle these?]
 ```
+If labeled_examples is empty, tell model to continue with the classification (classify based on the label descriptions).
+
+Include "The episode description may be short. Use the text that is available and choose the best label." for the description problem.
 
 ---
 
@@ -163,8 +169,12 @@ Extract the response text from:
 What string operations or parsing logic do you need?
 This depends on the output format you chose in build_few_shot_prompt.]
 ```
-
----
+The output will be in Label: / Reasoning: format.
+Given output = response.choices[0].message.content, I would extract both with:
+  left, right = output.split(" / ", 1)       
+  label = left.split(": ", 1)[1].lower()
+  reasoning = right.split(": ", 1)[1]
+  ---
 
 **Step 4 — Validate the label:**
 
@@ -172,6 +182,7 @@ This depends on the output format you chose in build_few_shot_prompt.]
 [blank — what do you do if the LLM returns a label that isn't in VALID_LABELS?
 What should label be set to?]
 ```
+Set it to "unknown".
 
 ---
 
@@ -182,6 +193,7 @@ What should label be set to?]
 What should the function return if something fails?
 Hint: the evaluation loop runs 20 calls — one bad response shouldn't crash everything.]
 ```
+Use a try and except call. In the except call, return {"label": "unknown", "reasoning": f"Error: {e}"}. In the try, return {"label": label, "reasoning": reasoning}.
 
 ---
 

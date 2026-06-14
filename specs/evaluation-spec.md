@@ -47,6 +47,9 @@ Returns the fraction of predictions that exactly match the ground truth.
 [blank — write out the accuracy formula in plain English.
  What counts as "correct"? What do you divide by?]
 ```
+Correct means that the prediction_normalized == ground_truth_normalized
+
+number of correct / total examples
 
 ---
 
@@ -58,7 +61,10 @@ Returns the fraction of predictions that exactly match the ground truth.
  2. ...
  3. ...]
 ```
-
+-first check length of both lists equal
+-if so, loop through each of the predictions and ground truth
+-Check if they equal each other normalized, if so, increment correct count
+-once done looping, divide number of correct by total examples
 ---
 
 **Edge case — what if both lists are empty?**
@@ -66,6 +72,7 @@ Returns the fraction of predictions that exactly match the ground truth.
 ```
 [blank — what should the function return? Why?]
 ```
+If both lists are empty, return 0.0.
 
 ---
 
@@ -77,6 +84,7 @@ ground_truth = ["interview", "solo", "solo",  "narrative"]
 
 [blank — what does compute_accuracy() return for these inputs? Show your work.]
 ```
+it would return 2/4 so 0.5 since the first two predictions are correct and the final two are not.
 
 ---
 
@@ -116,6 +124,9 @@ A `dict` keyed by label. Each value is a dict with three keys:
 [blank — be precise. When does an episode count as correctly classified
  for the "interview" class, for example?]
 ```
+Correct means that the groud truth is for a specific class and the prediction has the same label as that specific class.
+
+For example "interview" class, the ground truth has to be "interview" for it to qualify it as correct or not correct for the specific class. So, you have to be working with the specific class before determining if it is right or wrong.
 
 ---
 
@@ -124,6 +135,7 @@ A `dict` keyed by label. Each value is a dict with three keys:
 ```
 [blank — is "total" the total number of predictions, or something more specific?]
 ```
+total is the total number of ground truths that are in the given class.
 
 ---
 
@@ -138,6 +150,11 @@ A `dict` keyed by label. Each value is a dict with three keys:
  5. Return ...]
 ```
 
+1. Initialize different total variables for each class and different num correct variables for each class.
+2. loop through the lists, check which ground truth is being used and increment that corresponding total variable
+3. check if the prediction equals ground truth and increment the corresponding num correct variables
+4. once finished looping, calculate each of the four accuracies if applicable
+
 ---
 
 **Edge case — what if a class has no examples in ground_truth (total == 0)?**
@@ -146,6 +163,7 @@ A `dict` keyed by label. Each value is a dict with three keys:
 [blank — what should accuracy be set to? Why?
  Hint: look at the docstring in evaluate.py.]
 ```
+It should be 0.0.
 
 ---
 
@@ -159,10 +177,10 @@ ground_truth = ["interview", "solo",      "solo", "panel", "narrative"]
 
 label       correct  total  accuracy
 ----------  -------  -----  --------
-interview   [blank]  [blank]  [blank]
-solo        [blank]  [blank]  [blank]
-panel       [blank]  [blank]  [blank]
-narrative   [blank]  [blank]  [blank]
+interview   [1]  [1]  [1]
+solo        [1]  [2]  [0.5]
+panel       [1]  [1]  [1]
+narrative   [0]  [1]  [0]
 ```
 
 ---

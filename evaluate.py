@@ -51,14 +51,21 @@ def compute_accuracy(predictions: list[str], ground_truth: list[str]) -> float:
     """
     Compute overall classification accuracy.
 
-    TODO — Milestone 3:
-
     Accuracy = number of correct predictions / total predictions.
     A prediction is correct when it exactly matches the ground truth label.
-
-    Before writing code, complete specs/evaluation-spec.md.
     """
-    return 0.0
+    if len(predictions) != len(ground_truth):
+        raise ValueError("predictions and ground_truth must have the same length")
+
+    total = len(predictions)
+    if total == 0:
+        return 0.0
+
+    correct = sum(
+        1 for prediction, truth in zip(predictions, ground_truth)
+        if prediction == truth
+    )
+    return correct / total
 
 
 def compute_per_class_accuracy(
@@ -83,7 +90,27 @@ def compute_per_class_accuracy(
 
     Before writing code, complete specs/evaluation-spec.md.
     """
-    return {label: {"correct": 0, "total": 0, "accuracy": 0.0} for label in VALID_LABELS}
+    if len(predictions) != len(ground_truth):
+        raise ValueError("predictions and ground_truth must have the same length")
+
+    per_class = {
+        label: {"correct": 0, "total": 0, "accuracy": 0.0}
+        for label in VALID_LABELS
+    }
+
+    for prediction, truth in zip(predictions, ground_truth):
+        if truth not in per_class:
+            raise ValueError(f"Invalid ground truth label: {truth}")
+
+        per_class[truth]["total"] += 1
+        if prediction == truth:
+            per_class[truth]["correct"] += 1
+
+    for stats in per_class.values():
+        total = stats["total"]
+        stats["accuracy"] = stats["correct"] / total if total else 0.0
+
+    return per_class
 
 
 def format_evaluation_report(eval_results: dict) -> str:
